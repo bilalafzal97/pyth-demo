@@ -1,0 +1,30 @@
+[package]
+name = "pyth-demo"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "pyth_demo"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+
+[dependencies]
+#anchor-lang = { version = "0.29.0", features = ["init-if-needed"] }
+anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
+#pyth-solana-receiver-sdk = { version = "0.6.0", features = [] }
+pyth-sdk-solana = "0.10.1"
+pyth-solana-receiver-sdk = "1.0.1"
+
+#[patch.crates-io]
+#solana-program = "=1.18.26"
+#solana-pubkey = "=1.18.26"
+#anchor-lang = "=0.31.1"
+
