@@ -63,12 +63,20 @@ console.log("feedIdAccountAddress: ", feedIdAccountAddress.toBase58());
 const programId = new PublicKey("8xAgQUjq4yURfNbmxN2nf9gZ3NizaGUotUjTWCAWAjaY");
 const provider = new AnchorProvider(connection, feeAndRentPayerWallet, AnchorProvider.defaultOptions());
 const program: Program<PythDemo> = new Program(IDL, programId, provider);
-let can_push = false;
+let can_push = true;
 
 (async () => {
 
-    if (can_push) {
+    const feedIdAccountData = await pythSolanaReceiver.fetchPriceUpdateAccount(feedIdAccountAddress);
+    console.log("feedIdAccountData: ", feedIdAccountData);
 
+    console.log("publishTime: ", feedIdAccountData.priceMessage.publishTime.toNumber());
+
+    const blockTime = new BN(await connection.getBlockTime(await connection.getSlot()));
+
+    const last_publish = blockTime.toNumber() - feedIdAccountData.priceMessage.publishTime.toNumber();
+
+    if (last_publish > 30) {
         // Hermes provides other methods for retrieving price updates. See
         // https://hermes.pyth.network/docs for more information.
         const priceUpdateData = (
@@ -95,11 +103,13 @@ let can_push = false;
 
                 const priceUpdateAccount = getPriceUpdateAccount(feedId);
 
-                const priceReadIx = await program.methods.priceRead(feedId).accounts({priceUpdate: priceUpdateAccount}).instruction();
+                console.log("priceUpdateAccount - from push: ", priceUpdateAccount.toBase58());
+
+                const position = await program.methods.priceRead(feedId).accounts({priceUpdate: priceUpdateAccount}).instruction();
 
                 return [
                     {
-                        instruction: priceReadIx,
+                        instruction: position,
                         signers: []
                     }
                 ];
@@ -113,20 +123,7 @@ let can_push = false;
             {skipPreflight: true}
         );
     } else {
-
-        const feedIdAccountData = await pythSolanaReceiver.fetchPriceUpdateAccount(feedIdAccountAddress);
-        console.log("feedIdAccountData: ", feedIdAccountData);
-
-        console.log("publishTime: ", feedIdAccountData.priceMessage.publishTime.toNumber());
-
-        // time_left = current_time - publishTime;
-
-        // if (time_left <= 30) {}
-
-
-        // const priceReadTx = await program.methods.priceRead(feedId).accounts({priceUpdate: feedIdAccountAddress}).signers([feeAndRentPayerKeypair]).rpc();
-
-
+        const priceReadTx = await program.methods.priceRead(feedId).accounts({priceUpdate: feedIdAccountAddress}).signers([feeAndRentPayerKeypair]).rpc();
     }
 
 })();
