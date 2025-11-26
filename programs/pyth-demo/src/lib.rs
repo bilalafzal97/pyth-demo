@@ -11,7 +11,7 @@ pub mod pyth_demo {
 
         let price_update = &mut ctx.accounts.price_update;
         // get_price_no_older_than will fail if the price update is more than 5 seconds old
-        let maximum_age: u64 = 7;
+        let maximum_age: u64 = 20;
         // get_price_no_older_than will fail if the price update is for a different price feed.
         // This string is the id of the BTC/USD feed. See https://docs.pyth.network/price-feeds/price-feeds for all available IDs.
         // let feed_id: [u8; 32] = get_feed_id_from_hex("0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43")?;
